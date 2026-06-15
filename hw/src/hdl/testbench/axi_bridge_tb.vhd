@@ -86,16 +86,27 @@ begin
         resetn <= '1';
         wait for CLK_PERIOD;
 
-        axi_araddr  <= x"80"; -- Register 32
+        axi_araddr  <= x"80"; -- Register 32 (4 byte register)
         axi_arvalid <= '1';
         axi_rready  <= '1';
         wait for CLK_PERIOD;
 
         axi_arvalid <='0';
-        wait until axi_rvalid = '1';
+        wait for CLK_PERIOD;
 
-        axi_araddr <= (others => '0');
         axi_rready <= '0';
+        wait for CLK_PERIOD*2;
+
+        axi_araddr  <= x"84"; -- Register 33 (4 byte register)
+        axi_arvalid <= '1';
+        axi_rready  <= '1';
+        wait for CLK_PERIOD;
+
+        axi_arvalid <='0';
+        wait for CLK_PERIOD;
+
+        axi_rready <= '0';
+
         wait;
 
         end process;
