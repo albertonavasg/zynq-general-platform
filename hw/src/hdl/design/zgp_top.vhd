@@ -50,26 +50,26 @@ architecture Structure of zgp_top is
     signal axi_awvalid : std_logic;
     signal axi_awready : std_logic;
 
-    signal axi_wdata   : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
-    signal axi_wstrb   : std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0);
-    signal axi_wvalid  : std_logic;
-    signal axi_wready  : std_logic;
+    signal axi_wdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    signal axi_wstrb  : std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0);
+    signal axi_wvalid : std_logic;
+    signal axi_wready : std_logic;
 
-    signal axi_bresp   : std_logic_vector(1 downto 0);
-    signal axi_bready  : std_logic;
-    signal axi_bvalid  : std_logic;
+    signal axi_bresp  : std_logic_vector(1 downto 0);
+    signal axi_bready : std_logic;
+    signal axi_bvalid : std_logic;
 
     signal axi_araddr  : std_logic_vector(31 downto 0);
     signal axi_arprot  : std_logic_vector(2 downto 0);
     signal axi_arvalid : std_logic;
     signal axi_arready : std_logic;
 
-    signal axi_rdata   : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
-    signal axi_rresp   : std_logic_vector(1 downto 0);
-    signal axi_rvalid  : std_logic;
-    signal axi_rready  : std_logic;
+    signal axi_rdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    signal axi_rresp  : std_logic_vector(1 downto 0);
+    signal axi_rvalid : std_logic;
+    signal axi_rready : std_logic;
 
-    signal fixed_version : std_logic_vector(31 downto 0) := x"76" & x"00" & x"00" & x"01"; -- v0.0.1
+    signal fixed_version : std_logic_vector(31 downto 0) := x"76" & x"01" & x"00" & x"00"; -- v1.0.0
 
 begin
 
@@ -129,12 +129,12 @@ begin
 
     axi_bridge_inst: entity work.axi_bridge
         generic map (
-            C_S_AXI_DATA_WIDTH => AXI_DATA_WIDTH,
-            C_S_AXI_ADDR_WIDTH => AXI_ADDR_WIDTH
+            AXI_DATA_WIDTH => AXI_DATA_WIDTH,
+            AXI_ADDR_WIDTH => AXI_ADDR_WIDTH
         )
         port map (
-            s_axi_aclk    => clk,
-            s_axi_aresetn => resetn(0),
+            clk    => clk,
+            resetn => resetn(0),
 
             s_axi_awaddr  => axi_awaddr(AXI_ADDR_WIDTH-1 downto 0),
             s_axi_awprot  => axi_awprot,

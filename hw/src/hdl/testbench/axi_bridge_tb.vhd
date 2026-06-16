@@ -13,19 +13,33 @@ architecture behav of axi_bridge_tb is
 
     signal clk, resetn : std_logic := '0';
 
-    signal axi_araddr : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0) := (others => '0');
-    signal axi_arprot : std_logic_vector(2 downto 0) := (others => '0');
-    signal axi_arvalid: std_logic := '0';
-    signal axi_arready: std_logic := '0';
+    signal axi_awaddr : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0) := (others =>'0');
+    signal axi_awprot : std_logic_vector(2 downto 0) := (others =>'0');
+    signal axi_awvalid : std_logic:= '0';
+    signal axi_awready : std_logic:= '0';
+
+    signal axi_wdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0) := (others =>'0');
+    signal axi_wstrb  : std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0) := (others =>'0');
+    signal axi_wvalid : std_logic := '0';
+    signal axi_wready : std_logic := '0';
+
+    signal axi_bresp  : std_logic_vector(1 downto 0) := (others =>'0');
+    signal axi_bvalid : std_logic := '0';
+    signal axi_bready : std_logic := '0';
+
+    signal axi_araddr  : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal axi_arprot  : std_logic_vector(2 downto 0) := (others => '0');
+    signal axi_arvalid : std_logic := '0';
+    signal axi_arready : std_logic := '0';
 
     signal axi_rdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0) := (others => '0');
     signal axi_rresp  : std_logic_vector(1 downto 0) := (others => '0');
     signal axi_rvalid : std_logic := '0';
     signal axi_rready : std_logic := '0';
 
-    signal version : std_logic_vector(31 downto 0) := x"AABBCCDD";
-    signal sw      : std_logic_vector(1 downto 0)  := "11";
-    signal btn     : std_logic_vector(3 downto 0)  := "1111";
+    signal version : std_logic_vector(31 downto 0) := x"00001234";
+    signal sw      : std_logic_vector(1 downto 0)  := "10";
+    signal btn     : std_logic_vector(3 downto 0)  := "1010";
     signal led     : std_logic_vector(3 downto 0)  := (others => '0');
     signal led_bgr : std_logic_vector(5 downto 0)  := (others => '0');
 
@@ -33,36 +47,36 @@ begin
 
     dut: entity work.axi_bridge
         generic map (
-            C_S_AXI_DATA_WIDTH => AXI_DATA_WIDTH,
-            C_S_AXI_ADDR_WIDTH => AXI_ADDR_WIDTH
+            AXI_DATA_WIDTH => AXI_DATA_WIDTH,
+            AXI_ADDR_WIDTH => AXI_ADDR_WIDTH
         )
         port map (
-            S_AXI_ACLK    => clk,
-            S_AXI_ARESETN => resetn,
+            clk    => clk,
+            resetn => resetn,
 
-            S_AXI_AWADDR  => (others => '0'),
-            S_AXI_AWPROT  => (others => '0'),
-            S_AXI_AWVALID => '0',
-            S_AXI_AWREADY => open,
+            s_axi_awaddr  => axi_awaddr,
+            s_axi_awprot  => axi_awprot,
+            s_axi_awvalid => axi_awvalid,
+            s_axi_awready => axi_awready,
 
-            S_AXI_WDATA	  => (others => '0'),
-            S_AXI_WSTRB	  => (others => '0'),
-            S_AXI_WVALID  => '0',
-            S_AXI_WREADY  => open,
+            s_axi_wdata	  => axi_wdata,
+            s_axi_wstrb	  => axi_wstrb,
+            s_axi_wvalid  => axi_wvalid,
+            s_axi_wready  => axi_wready,
 
-            S_AXI_BRESP	  => open,
-            S_AXI_BVALID  => open,
-            S_AXI_BREADY  => '0',
+            s_axi_bresp	  => axi_bresp,
+            s_axi_bvalid  => axi_bvalid,
+            s_axi_bready  => axi_bready,
 
-            S_AXI_ARADDR  => axi_araddr,
-            S_AXI_ARPROT  => axi_arprot,
-            S_AXI_ARVALID => axi_arvalid,
-            S_AXI_ARREADY => axi_arready,
+            s_axi_araddr  => axi_araddr,
+            s_axi_arprot  => axi_arprot,
+            s_axi_arvalid => axi_arvalid,
+            s_axi_arready => axi_arready,
 
-            S_AXI_RDATA	 => axi_rdata,
-            S_AXI_RRESP	 => axi_rresp,
-            S_AXI_RVALID => axi_rvalid,
-            S_AXI_RREADY => axi_rready,
+            s_axi_rdata	 => axi_rdata,
+            s_axi_rresp	 => axi_rresp,
+            s_axi_rvalid => axi_rvalid,
+            s_axi_rready => axi_rready,
 
             version => version,
 
@@ -86,7 +100,8 @@ begin
         resetn <= '1';
         wait for CLK_PERIOD;
 
-        axi_araddr  <= x"80"; -- Register 32 (4 byte register)
+        -- Read register 32
+        axi_araddr  <= x"80";
         axi_arvalid <= '1';
         axi_rready  <= '1';
         wait for CLK_PERIOD;
@@ -97,7 +112,8 @@ begin
         axi_rready <= '0';
         wait for CLK_PERIOD*2;
 
-        axi_araddr  <= x"84"; -- Register 33 (4 byte register)
+        -- Read register 33
+        axi_araddr  <= x"84";
         axi_arvalid <= '1';
         axi_rready  <= '1';
         wait for CLK_PERIOD;
@@ -106,6 +122,68 @@ begin
         wait for CLK_PERIOD;
 
         axi_rready <= '0';
+        wait for CLK_PERIOD*2;
+
+        -- Write register 0
+        axi_awaddr <= x"00";
+        axi_awvalid <= '1';
+
+        axi_wdata <= x"0000" & b"000000" & b"1111111111";
+        axi_wstrb <= b"1111";
+        axi_wvalid <= '1';
+
+        axi_bready <= '1';
+        wait for CLK_PERIOD;
+
+        axi_awvalid <= '0';
+        axi_wvalid <= '0';
+        wait for CLK_PERIOD*3;
+
+        axi_bready <= '0';
+        wait for CLK_PERIOD;
+
+        -- Write register 0 (First addr, then data)
+        axi_awaddr <= x"00";
+        axi_awvalid <= '1';
+
+        axi_bready <= '1';
+        wait for CLK_PERIOD*1;
+
+        axi_awvalid <= '0';
+        wait for CLK_PERIOD;
+
+        axi_wdata <= x"0000" & b"000000" & b"0101011100";
+        axi_wstrb <= b"1111";
+        axi_wvalid <= '1';
+        wait for CLK_PERIOD;
+
+        axi_wvalid <= '0';
+        wait for CLK_PERIOD*3;
+
+        axi_bready <= '0';
+        wait for CLK_PERIOD;
+
+        -- Write register 0 (First data, then addr)
+        axi_wdata <= x"0000" & b"000000" & b"1010100011";
+        axi_wstrb <= b"1111";
+        axi_wvalid <= '1';
+
+        axi_bready <= '1';
+        wait for CLK_PERIOD*1;
+
+        axi_wvalid <= '0';
+        wait for CLK_PERIOD;
+
+        axi_awaddr <= x"00";
+        axi_awvalid <= '1';
+
+        wait for CLK_PERIOD;
+
+        axi_awvalid <= '0';
+        wait for CLK_PERIOD*3;
+
+        axi_bready <= '0';
+        wait for CLK_PERIOD;
 
         wait;
 
